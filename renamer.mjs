@@ -46,12 +46,11 @@ try {
         filename = date.toISOString().substring(0, 10) + '_' + filename; // prepend date
         const newFilepath = path.join(direcory, filename + extname);
         
-        console.log(`mv "${filepath}" "${newFilepath}"`);
         fs.rename(filepath, newFilepath, (err) => {
+            console.log(`mv "${filepath}" "${newFilepath}"`);
             if (err) {
                 throw err;
             }
-            console.log("Success.")
         });
     });
 } catch (error) {
