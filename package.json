@@ -1,0 +1,13 @@
+{
+  "name": "renamer",
+  "version": "0.0.3",
+  "description": "Rename files by a defined scheme.",
+  "type": "module",
+  "main": "renamer.mjs",
+  "scripts": {
+    "start": "node renamer.mjs",
+    "deploy": "./platybus.sh"
+  },
+  "author": "Peter Oltmann",
+  "license": "ISC"
+}
