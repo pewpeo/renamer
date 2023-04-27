@@ -20,9 +20,11 @@ export function replaceUmlauts(str) {
 
 export function renameFileStr(filename, date = new Date()) {
     filename = replaceUmlauts(filename);
-    // TODO: check which characters should sta
-    // replace all non-ascii, the listet ascii characters and spaces (\s) with '_'
-    filename = filename.replace(/[\u{0080}-\u{FFFF} \.,"!@#\$%\^&\*\(\)\-=\+;:<>\/\\\|\}\{\[\]`~\s]+/gu, "_");
+    // replace with '_':
+    //   - all non-ascii
+    //   - the listet ascii characters and spaces (\s)
+    //   - more than one '1'
+    filename = filename.replace(/[\u{0080}-\u{FFFF} \.,"!@#\$%\^&\*\(\)=\+;:<>\/\\\|\}\{\[\]`~\s]+|-{2,}/gu, "_");
     filename = date.toISOString().substring(0, 10) + '_' + filename; // prepend date
 
     return filename;
