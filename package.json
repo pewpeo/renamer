@@ -6,8 +6,12 @@
   "main": "renamer.mjs",
   "scripts": {
     "start": "node renamer.mjs",
+    "test": "mocha",
     "deploy": "./platybus.sh"
   },
   "author": "Peter Oltmann",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^10.2.0"
+  }
 }
