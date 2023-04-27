@@ -6,14 +6,31 @@ on: [push, workflow_dispatch]
 #     tags:
 #       - '[0-9]+.[0-9]+.[0-9]+'
 #   workflow_dispatch:
+env:
+  VERSION: $(git describe --tags --always)
 jobs:
-  test:
+  deploy:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 'v18.15.x'
-      - run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-      - run: brew install --cask platypus
-      - run: ./platybus.sh
+      - name: Install platypus
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew install --cask platypus
+          mv /Applications/Platypus.app/Contents/Resources/InstallCommandLineTool.sh /Applications/Platypus.app/Contents/Resources/InstallCommandLineTool.sh.save
+          cp ./InstallCommandLineTool.sh /Applications/Platypus.app/Contents/Resources/InstallCommandLineTool.sh
+          cd /Applications/Platypus.app/Contents/Resources/ && ./InstallCommandLineTool.sh
+      - name: Create App
+        run: ./platybus.sh
+      - name: Set env
+        run: echo "RELEASE_VERSION=$(git describe --tags --always)" >> $GITHUB_ENV
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Renamer-${{ env.RELEASE_VERSION }}
+          path: |
+            dist/
+            !dist/script
