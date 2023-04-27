@@ -42,7 +42,8 @@ try {
         const extname = path.extname(filepath);
         let filename = path.basename(filepath, extname);
         filename = replaceUmlauts(filename);
-        filename = filename.replaceAll(' ', '_');
+        // replace 1+ ascii characters and spaces (\s) with '_'
+        filename = filename.replace(/[\.,"!@#\$%\^&\*\(\)\-=\+;:<>\/\\\|\}\{\[\]`~\s]+/g, '_');
         filename = date.toISOString().substring(0, 10) + '_' + filename; // prepend date
         const newFilepath = path.join(direcory, filename + extname);
         
