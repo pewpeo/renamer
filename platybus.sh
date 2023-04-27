@@ -24,6 +24,9 @@ chmod u+x script
 CMD=("platypus -y \
 --droppable \
 --name 'Renamer' \
+--bundle-identifier 'org.pewpeo.renamer' \
+--author 'Peter Oltmann' \
+--app-version $(git describe --tags --always) \
 --interface-type 'Droplet' \
 --interpreter '/bin/sh' \
 --uniform-type-identifiers 'public.item|public.folder' \
