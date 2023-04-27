@@ -1,0 +1,19 @@
+name: cd-pipeline
+run-name: ${{ github.actor }} is running the CD pipeline
+on: [push, workflow_dispatch]
+# on:
+#   push:
+#     tags:
+#       - '[0-9]+.[0-9]+.[0-9]+'
+#   workflow_dispatch:
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 'v18.15.x'
+      - run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      - run: brew install --cask platypus
+      - run: ./platybus.sh
