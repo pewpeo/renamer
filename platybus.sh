@@ -31,7 +31,7 @@ CMD=("platypus -y \
 --interpreter '/bin/sh' \
 --uniform-type-identifiers 'public.item|public.folder' \
 --bundled-file '"${NODE_VERSION_DIR}"' \
---bundled-file 'rename.js' \
+--bundled-file 'rename.mjs' \
 --bundled-file 'renamer.mjs' \
 'dist/script' 'dist/Renamer'")
 

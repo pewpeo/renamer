@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { renameFilepathStr } from './rename.js';
+import { renameFilepathStr } from './rename.mjs';
 import * as fs from 'node:fs';
 
 // remove node executable and mjs filename

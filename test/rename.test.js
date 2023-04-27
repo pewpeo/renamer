@@ -1,5 +1,5 @@
 import { equal } from 'assert';
-import { renameFileStr } from '../rename.js';
+import { renameFileStr } from '../rename.mjs';
 
 
 const testData = [
@@ -14,7 +14,6 @@ describe('Rename', function () {
     describe('#renameFileStr()', function () {
         it('Replace umlauts, non-ascii, ascii special characters and spaces (\s) with "_" and prepend the date', function () {
             testData.forEach((testCase) => {
-                console.log(renameFileStr(testCase.filename, testCase.date))
                 equal(renameFileStr(testCase.filename, testCase.date), testCase.result);
             });
         });
