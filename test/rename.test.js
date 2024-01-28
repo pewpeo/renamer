@@ -8,6 +8,8 @@ const testData = [
     { filename: '1  è',            date: new Date('2023-04-25'), result: '2023-04-25_1_' },
     { filename: 'this-is-a-test',  date: new Date('2023-04-25'), result: '2023-04-25_this-is-a-test' },
     { filename: 'this-is-a--test', date: new Date('2023-04-25'), result: '2023-04-25_this-is-a_test' },
+    { filename: '2023-04-25_this_is_a_test',  date: new Date('2023-04-25'), result: '2023-04-25_this_is_a_test' },
+    { filename: '2023-04-25_this_is_ä_test',  date: new Date('2023-04-25'), result: '2023-04-25_this_is_ae_test' },
 ];
 
 describe('Rename', function () {
