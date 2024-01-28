@@ -25,7 +25,12 @@ export function renameFileStr(filename, date = new Date()) {
     //   - the listet ascii characters and spaces (\s)
     //   - more than one '1'
     filename = filename.replace(/[\u{0080}-\u{FFFF} \.,"!@#\$%\^&\*\(\)=\+;:<>\/\\\|\}\{\[\]`~\s]+|-{2,}/gu, "_");
-    filename = date.toISOString().substring(0, 10) + '_' + filename; // prepend date
+
+    // don't prepend filenames that already start with 'yyyy-MM-dd'
+    const dateRegex = /^[0-9]{4}-[0-9]{2}-[0-9]{2}_/
+    if (!dateRegex.test(filename)) {
+        filename = date.toISOString().substring(0, 10) + '_' + filename; // prepend date
+    }
 
     return filename;
 }
