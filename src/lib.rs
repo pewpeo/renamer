@@ -35,16 +35,19 @@ fn rename_file_str(filename: &str, date: NaiveDate) -> String {
     prepend_date(&filename, date)
 }
 
-fn get_rename_filename(basename: &Path, extname: &str) -> PathBuf {
+fn get_rename_filename(basename: &Path, extname: Option<&str>) -> PathBuf {
     let filename = rename_file_str(&basename.to_string_lossy(), Local::now().date_naive());
-    format!("{}.{}", filename, extname).into()
+    match extname {
+        Some(ext) => format!("{}.{}", filename, ext).into(),
+        None => filename.into(),
+    }
 }
 
 pub fn get_rename_filepath(filepath: &Path) -> Option<PathBuf> {
     let dirname = filepath.parent()?;
-    let extname = filepath.extension()?;
+    let extname = filepath.extension().map(|e| e.to_string_lossy());
     let basename = PathBuf::from(filepath.file_stem()?);
-    let filename = get_rename_filename(&basename, &extname.to_string_lossy());
+    let filename = get_rename_filename(&basename, extname.as_deref());
     Some(dirname.join(filename))
 }
 
@@ -102,12 +105,23 @@ mod tests {
         );
     }
 
-    
     #[test]
     fn preserves_existing_date_prefix_with_umlauts() {
         assert_eq!(
             rename_file_str("2023-04-25_this_is_ä_test", date()),
             "2023-04-25_this_is_ae_test"
+        );
+    }
+
+    #[test]
+    fn omits_extension_when_none() {
+        let path = Path::new("/some/dir/testfile");
+        let result = get_rename_filepath(path).unwrap();
+        let filename = result.file_name().unwrap().to_string_lossy();
+        assert!(
+            !filename.contains('.'),
+            "expected no extension, got: {}",
+            filename
         );
     }
 }
