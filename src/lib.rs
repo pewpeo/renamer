@@ -22,6 +22,10 @@ fn sanitize_filename(filename: &str) -> String {
 
 fn prepend_date(filename: &str, date: NaiveDate) -> String {
     let formatted = date.format("%Y-%m-%d");
+    // preserve existing date prefix
+    if filename.starts_with(&formatted.to_string()) {
+        return filename.to_string();
+    }
     format!("{}_{}", formatted, filename)
 }
 
@@ -87,6 +91,23 @@ mod tests {
         assert_eq!(
             rename_file_str("this-is-a--test", date()),
             "2023-04-25_this-is-a_test"
+        );
+    }
+
+    #[test]
+    fn preserves_existing_date_prefix() {
+        assert_eq!(
+            rename_file_str("2023-04-25_this_is_a_test", date()),
+            "2023-04-25_this_is_a_test"
+        );
+    }
+
+    
+    #[test]
+    fn preserves_existing_date_prefix_with_umlauts() {
+        assert_eq!(
+            rename_file_str("2023-04-25_this_is_ä_test", date()),
+            "2023-04-25_this_is_ae_test"
         );
     }
 }
