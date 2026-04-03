@@ -1,5 +1,4 @@
 name: cd-pipeline
-run-name: ${{ github.actor }} is running the CD pipeline
 on:
   push:
     tags:

@@ -1,5 +1,4 @@
 name: ci-pipeline
-run-name: ${{ github.actor }} is running the CI pipeline
 on:
   push:
     branches: [ main ]
