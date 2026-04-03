@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use chrono::{Local, NaiveDate};
+use chrono::NaiveDate;
 use regex::Regex;
 
 fn replace_umlauts(filename: &str) -> String {
@@ -35,19 +35,19 @@ fn rename_file_str(filename: &str, date: NaiveDate) -> String {
     prepend_date(&filename, date)
 }
 
-fn get_rename_filename(basename: &Path, extname: Option<&str>) -> PathBuf {
-    let filename = rename_file_str(&basename.to_string_lossy(), Local::now().date_naive());
+fn get_rename_filename(basename: &Path, extname: Option<&str>, date: NaiveDate) -> PathBuf {
+    let filename = rename_file_str(&basename.to_string_lossy(), date);
     match extname {
         Some(ext) => format!("{}.{}", filename, ext).into(),
         None => filename.into(),
     }
 }
 
-pub fn get_rename_filepath(filepath: &Path) -> Option<PathBuf> {
+pub fn get_rename_filepath(filepath: &Path, date: NaiveDate) -> Option<PathBuf> {
     let dirname = filepath.parent()?;
     let extname = filepath.extension().map(|e| e.to_string_lossy());
     let basename = PathBuf::from(filepath.file_stem()?);
-    let filename = get_rename_filename(&basename, extname.as_deref());
+    let filename = get_rename_filename(&basename, extname.as_deref(), date);
     Some(dirname.join(filename))
 }
 
@@ -58,6 +58,10 @@ mod tests {
 
     fn date() -> NaiveDate {
         NaiveDate::from_ymd_opt(2023, 4, 25).unwrap()
+    }
+
+    fn date_prefix() -> String {
+        date().format("%Y-%m-%d").to_string()
     }
 
     #[test]
@@ -113,28 +117,24 @@ mod tests {
         );
     }
 
-    fn today() -> String {
-        Local::now().date_naive().format("%Y-%m-%d").to_string()
-    }
-
     #[test]
     fn filepath_preserves_directory() {
         let path = Path::new("/some/dir/testfile.txt");
-        let result = get_rename_filepath(path).unwrap();
+        let result = get_rename_filepath(path, date()).unwrap();
         assert_eq!(result.parent().unwrap(), Path::new("/some/dir"));
     }
 
     #[test]
     fn filepath_preserves_extension() {
         let path = Path::new("/some/dir/testfile.txt");
-        let result = get_rename_filepath(path).unwrap();
+        let result = get_rename_filepath(path, date()).unwrap();
         assert_eq!(result.extension().unwrap(), "txt");
     }
 
     #[test]
     fn filepath_omits_extension_when_none() {
         let path = Path::new("/some/dir/testfile");
-        let result = get_rename_filepath(path).unwrap();
+        let result = get_rename_filepath(path, date()).unwrap();
         let filename = result.file_name().unwrap().to_string_lossy();
         assert!(
             !filename.contains('.'),
@@ -146,10 +146,10 @@ mod tests {
     #[test]
     fn filepath_prepends_date() {
         let path = Path::new("/dir/testfile.pdf");
-        let result = get_rename_filepath(path).unwrap();
+        let result = get_rename_filepath(path, date()).unwrap();
         let filename = result.file_name().unwrap().to_string_lossy();
         assert!(
-            filename.starts_with(&today()),
+            filename.starts_with(&date_prefix()),
             "expected date prefix, got: {}",
             filename
         );
@@ -158,31 +158,31 @@ mod tests {
     #[test]
     fn filepath_sanitizes_filename() {
         let path = Path::new("/dir/hello world (1).pdf");
-        let result = get_rename_filepath(path).unwrap();
-        let expected = format!("/dir/{}_hello_world_1_.pdf", today());
+        let result = get_rename_filepath(path, date()).unwrap();
+        let expected = format!("/dir/{}_hello_world_1_.pdf", date_prefix());
         assert_eq!(result, PathBuf::from(expected));
     }
 
     #[test]
     fn filepath_replaces_umlauts() {
         let path = Path::new("/dir/Ärzte-überweisung.pdf");
-        let result = get_rename_filepath(path).unwrap();
-        let expected = format!("/dir/{}_Aerzte-ueberweisung.pdf", today());
+        let result = get_rename_filepath(path, date()).unwrap();
+        let expected = format!("/dir/{}_Aerzte-ueberweisung.pdf", date_prefix());
         assert_eq!(result, PathBuf::from(expected));
     }
 
     #[test]
     fn filepath_returns_none_for_empty_path() {
         let path = Path::new("");
-        assert!(get_rename_filepath(path).is_none());
+        assert!(get_rename_filepath(path, date()).is_none());
     }
 
     #[test]
     fn filepath_handles_dotfile() {
         let path = Path::new("/dir/.gitignore");
-        let result = get_rename_filepath(path).unwrap();
+        let result = get_rename_filepath(path, date()).unwrap();
         assert_eq!(result.extension(), None);
         let filename = result.file_name().unwrap().to_string_lossy();
-        assert!(filename.starts_with(&today()));
+        assert!(filename.starts_with(&date_prefix()));
     }
 }

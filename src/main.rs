@@ -1,5 +1,6 @@
 use std::{fs, path::PathBuf};
 
+use chrono::Local;
 use clap::Parser;
 use renamer_rust::get_rename_filepath;
 
@@ -13,7 +14,7 @@ fn main() -> std::io::Result<()> {
     let args = Args::parse();
 
     for filename in args.filenames {
-        let filepath = match get_rename_filepath(&filename) {
+        let filepath = match get_rename_filepath(&filename, Local::now().date_naive()) {
             Some(filepath) => filepath,
             None => {
                 return Err(std::io::Error::other("Failed to get rename filepath"));
