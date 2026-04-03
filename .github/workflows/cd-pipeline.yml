@@ -16,7 +16,7 @@ jobs:
       - name: Build release
         run: cargo build --release
       - name: Archive release binary
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: renamer-rust-${{ env.RELEASE_VERSION }}
           path: target/release/renamer-rust
@@ -29,7 +29,7 @@ jobs:
       - name: Create App
         run: ./platybus.sh
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: Renamer-${{ env.RELEASE_VERSION }}
           path: |
