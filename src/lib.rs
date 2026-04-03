@@ -14,9 +14,7 @@ fn replace_umlauts(filename: &str) -> String {
 }
 
 fn sanitize_filename(filename: &str) -> String {
-    let re =
-        Regex::new(r#"[\x{0080}-\x{FFFF} \.,\"!@#\$%\^&\*\(\)=\+;:<>/\\\|\}\{\[\]`~\s]+|-{2,}"#)
-            .unwrap();
+    let re = Regex::new(r#"[\x{0080}-\x{FFFF} \.,\"!@#\$%\^&\*\(\)=\+;:<>/\\\|\}\{\[\]`~\s]+|-{2,}"#).unwrap();
     re.replace_all(filename, "_").into_owned()
 }
 
@@ -66,18 +64,12 @@ mod tests {
 
     #[test]
     fn replaces_umlauts_and_special_chars_with_underscore() {
-        assert_eq!(
-            rename_file_str("test 123 ü `", date()),
-            "2023-04-25_test_123_ue_"
-        );
+        assert_eq!(rename_file_str("test 123 ü `", date()), "2023-04-25_test_123_ue_");
     }
 
     #[test]
     fn collapses_multiple_spaces() {
-        assert_eq!(
-            rename_file_str("test    123 ü `", date()),
-            "2023-04-25_test_123_ue_"
-        );
+        assert_eq!(rename_file_str("test    123 ü `", date()), "2023-04-25_test_123_ue_");
     }
 
     #[test]
@@ -87,18 +79,12 @@ mod tests {
 
     #[test]
     fn preserves_single_hyphens() {
-        assert_eq!(
-            rename_file_str("this-is-a-test", date()),
-            "2023-04-25_this-is-a-test"
-        );
+        assert_eq!(rename_file_str("this-is-a-test", date()), "2023-04-25_this-is-a-test");
     }
 
     #[test]
     fn replaces_consecutive_hyphens_with_underscore() {
-        assert_eq!(
-            rename_file_str("this-is-a--test", date()),
-            "2023-04-25_this-is-a_test"
-        );
+        assert_eq!(rename_file_str("this-is-a--test", date()), "2023-04-25_this-is-a_test");
     }
 
     #[test]
@@ -136,11 +122,7 @@ mod tests {
         let path = Path::new("/some/dir/testfile");
         let result = get_rename_filepath(path, date()).unwrap();
         let filename = result.file_name().unwrap().to_string_lossy();
-        assert!(
-            !filename.contains('.'),
-            "expected no extension, got: {}",
-            filename
-        );
+        assert!(!filename.contains('.'), "expected no extension, got: {}", filename);
     }
 
     #[test]
