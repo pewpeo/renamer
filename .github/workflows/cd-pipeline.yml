@@ -24,9 +24,10 @@ jobs:
           path: target/release/renamer-rust
       - name: Install platypus
         run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          brew install --cask platypus
-          cd /Applications/Platypus.app/Contents/Resources/ && ./InstallCommandLineTool.sh
+          curl -fsSL -o /tmp/platypus.zip https://sveinbjorn.org/files/software/platypus.zip
+          unzip -q /tmp/platypus.zip -d /tmp/platypus
+          sudo cp -R /tmp/platypus/Platypus.app /Applications/Platypus.app
+          cd /Applications/Platypus.app/Contents/Resources/ && sudo ./InstallCommandLineTool.sh
       - name: Create App
         run: ./platybus.sh
       - name: Archive production artifacts
