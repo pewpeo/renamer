@@ -1,0 +1,38 @@
+name: cd-pipeline
+run-name: ${{ github.actor }} is running the CD pipeline
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+env:
+  VERSION: $(git describe --tags --always)
+jobs:
+  deploy:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set env
+        run: echo "RELEASE_VERSION=$(git describe --tags --always)" >> $GITHUB_ENV
+      - name: Build release
+        run: cargo build --release
+      - name: Archive release binary
+        uses: actions/upload-artifact@v6
+        with:
+          name: renamer-rust-${{ env.RELEASE_VERSION }}
+          path: target/release/renamer-rust
+      - name: Install platypus
+        run: |
+          curl -fsSL -o /tmp/platypus.zip https://sveinbjorn.org/files/software/platypus.zip
+          unzip -q /tmp/platypus.zip -d /tmp/platypus
+          sudo cp -R /tmp/platypus/Platypus.app /Applications/Platypus.app
+          cd /Applications/Platypus.app/Contents/Resources/ && sudo ./InstallCommandLineTool.sh
+      - name: Create App
+        run: ./platybus.sh
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: Renamer-${{ env.RELEASE_VERSION }}
+          path: |
+            dist/
+            !dist/script
