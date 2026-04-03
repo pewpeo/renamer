@@ -1,0 +1,31 @@
+name: cd-pipeline
+run-name: ${{ github.actor }} is running the CD pipeline
+on: [push, workflow_dispatch]
+# on:
+#   push:
+#     tags:
+#       - '[0-9]+.[0-9]+.[0-9]+'
+#   workflow_dispatch:
+env:
+  VERSION: $(git describe --tags --always)
+jobs:
+  deploy:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install platypus
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew install --cask platypus
+          cd /Applications/Platypus.app/Contents/Resources/ && ./InstallCommandLineTool.sh
+      - name: Create App
+        run: ./platybus.sh
+      - name: Set env
+        run: echo "RELEASE_VERSION=$(git describe --tags --always)" >> $GITHUB_ENV
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: Renamer-${{ env.RELEASE_VERSION }}
+          path: |
+            dist/
+            !dist/script
