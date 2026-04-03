@@ -113,8 +113,26 @@ mod tests {
         );
     }
 
+    fn today() -> String {
+        Local::now().date_naive().format("%Y-%m-%d").to_string()
+    }
+
     #[test]
-    fn omits_extension_when_none() {
+    fn filepath_preserves_directory() {
+        let path = Path::new("/some/dir/testfile.txt");
+        let result = get_rename_filepath(path).unwrap();
+        assert_eq!(result.parent().unwrap(), Path::new("/some/dir"));
+    }
+
+    #[test]
+    fn filepath_preserves_extension() {
+        let path = Path::new("/some/dir/testfile.txt");
+        let result = get_rename_filepath(path).unwrap();
+        assert_eq!(result.extension().unwrap(), "txt");
+    }
+
+    #[test]
+    fn filepath_omits_extension_when_none() {
         let path = Path::new("/some/dir/testfile");
         let result = get_rename_filepath(path).unwrap();
         let filename = result.file_name().unwrap().to_string_lossy();
@@ -123,5 +141,48 @@ mod tests {
             "expected no extension, got: {}",
             filename
         );
+    }
+
+    #[test]
+    fn filepath_prepends_date() {
+        let path = Path::new("/dir/testfile.pdf");
+        let result = get_rename_filepath(path).unwrap();
+        let filename = result.file_name().unwrap().to_string_lossy();
+        assert!(
+            filename.starts_with(&today()),
+            "expected date prefix, got: {}",
+            filename
+        );
+    }
+
+    #[test]
+    fn filepath_sanitizes_filename() {
+        let path = Path::new("/dir/hello world (1).pdf");
+        let result = get_rename_filepath(path).unwrap();
+        let expected = format!("/dir/{}_hello_world_1_.pdf", today());
+        assert_eq!(result, PathBuf::from(expected));
+    }
+
+    #[test]
+    fn filepath_replaces_umlauts() {
+        let path = Path::new("/dir/Ärzte-überweisung.pdf");
+        let result = get_rename_filepath(path).unwrap();
+        let expected = format!("/dir/{}_Aerzte-ueberweisung.pdf", today());
+        assert_eq!(result, PathBuf::from(expected));
+    }
+
+    #[test]
+    fn filepath_returns_none_for_empty_path() {
+        let path = Path::new("");
+        assert!(get_rename_filepath(path).is_none());
+    }
+
+    #[test]
+    fn filepath_handles_dotfile() {
+        let path = Path::new("/dir/.gitignore");
+        let result = get_rename_filepath(path).unwrap();
+        assert_eq!(result.extension(), None);
+        let filename = result.file_name().unwrap().to_string_lossy();
+        assert!(filename.starts_with(&today()));
     }
 }
