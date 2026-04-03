@@ -6,12 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 jobs:
-  test:
+  built-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 'v20.x.x'
-      - run: npm ci
-      - run: npm test
+      - uses: actions/checkout@v6
+      - run: cargo build
+      - run: cargo test
