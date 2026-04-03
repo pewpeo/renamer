@@ -1,11 +1,10 @@
 name: cd-pipeline
 run-name: ${{ github.actor }} is running the CD pipeline
-on: [push, workflow_dispatch]
-# on:
-#   push:
-#     tags:
-#       - '[0-9]+.[0-9]+.[0-9]+'
-#   workflow_dispatch:
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
 env:
   VERSION: $(git describe --tags --always)
 jobs:
