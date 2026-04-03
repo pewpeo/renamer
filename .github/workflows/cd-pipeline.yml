@@ -18,6 +18,8 @@ jobs:
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           brew install --cask platypus
           cd /Applications/Platypus.app/Contents/Resources/ && ./InstallCommandLineTool.sh
+      - name: Build release
+        run: cargo build --release
       - name: Create App
         run: ./platybus.sh
       - name: Set env
