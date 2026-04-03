@@ -13,17 +13,22 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
+      - name: Set env
+        run: echo "RELEASE_VERSION=$(git describe --tags --always)" >> $GITHUB_ENV
+      - name: Build release
+        run: cargo build --release
+      - name: Archive release binary
+        uses: actions/upload-artifact@v6
+        with:
+          name: renamer-rust-${{ env.RELEASE_VERSION }}
+          path: target/release/renamer-rust
       - name: Install platypus
         run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           brew install --cask platypus
           cd /Applications/Platypus.app/Contents/Resources/ && ./InstallCommandLineTool.sh
-      - name: Build release
-        run: cargo build --release
       - name: Create App
         run: ./platybus.sh
-      - name: Set env
-        run: echo "RELEASE_VERSION=$(git describe --tags --always)" >> $GITHUB_ENV
       - name: Archive production artifacts
         uses: actions/upload-artifact@v6
         with:
