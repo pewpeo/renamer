@@ -13,7 +13,7 @@ jobs:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set env
         run: echo "RELEASE_VERSION=$(git describe --tags --always)" >> $GITHUB_ENV
       - name: Build release
